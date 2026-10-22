@@ -1,0 +1,46 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+!.env.example
+
+# Dependencies
+**/node_modules/
+**/vendor/
+
+# Build output
+**/.next/
+**/out/
+**/build/
+**/public/build/
+
+# Laravel generated files
+tube-profile-backend/storage/*.key
+tube-profile-backend/storage/logs/*.log
+tube-profile-backend/bootstrap/cache/*.php
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+
+# Local database files
+tube-profile-backend/database/*.sqlite
+tube-profile-backend/database/*.sqlite-*
+
+# Logs
+tube-profile-backend/storage/logs/
+
+# Laravel runtime files
+tube-profile-backend/bootstrap/cache/*.php
+tube-profile-backend/storage/framework/cache/
+tube-profile-backend/storage/framework/sessions/
+tube-profile-backend/storage/framework/views/
+
+# Frontend build output
+tube-profile-frontend/.next/
+tube-profile-frontend/out/
+tube-profile-frontend/node_modules/
