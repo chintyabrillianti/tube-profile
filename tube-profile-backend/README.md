@@ -21,6 +21,43 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Tube Profile admin authentication
+
+The admin login uses Laravel Sanctum's first-party session-cookie flow. Set
+`SANCTUM_STATEFUL_DOMAINS` and `CORS_ALLOWED_ORIGINS` to the exact frontend
+host and port. The frontend and API should use the same hostname in local
+development (for example, both `127.0.0.1`). In production, use HTTPS and set
+`SESSION_SECURE_COOKIE=true`; do not use wildcard CORS origins with cookies.
+
+After confirming that the database has the `roles` and `user_roles` tables, run
+`php artisan tube-profile:create-admin` to create an admin interactively. The
+command prompts for an email and a password of at least 12 characters with
+uppercase and lowercase letters, a number, and a symbol. It was not run as
+part of this audit. The role-table migration creates either table only if it is
+missing and does not drop existing role data when rolled back.
+
+The admin login page is `/admin/login`. Protected API requests must use the
+`auth:sanctum` and `admin` middleware. The public profile and service endpoints
+remain public.
+
+Admins can manage the existing company profile at `/admin/company-profile`.
+The protected `GET` and `PUT /api/admin/company-profile` endpoints use the
+existing `company_profiles` table; no schema migration is required. Public
+profile endpoints return only published profile fields.
+
+## Tube Profile projects
+
+Project records extend the existing `projects` table without removing legacy
+columns or data. Run `php artisan migrate` to add the month/year period, work
+type, and image-path fields. Project images use Laravel's public storage disk;
+run `php artisan storage:link` so URLs under `/storage` can be served.
+
+The public `GET /api/projects` endpoint returns only published projects with
+complete portfolio details. Admins manage all records through the protected
+`GET`, `POST`, `PUT`, and `DELETE /api/admin/projects` endpoints. Create and
+update requests accept multipart form data and JPG, PNG, or WebP images up to
+5 MB.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.

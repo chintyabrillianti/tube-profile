@@ -1,48 +1,49 @@
 import BrandMark from "./brand-mark";
 import SiteHeader from "./site-header";
-
-const services = [
-  {
-    number: "01",
-    title: "Tube Cleaning",
-    description:
-      "Remove deposits and buildup from heat exchanger and process tubes to support efficient operation.",
-    icon: "tube",
-  },
-  {
-    number: "02",
-    title: "Pipe Cleaning",
-    description:
-      "Clear internal pipework with an approach suited to the line, material, and type of fouling.",
-    icon: "pipe",
-  },
-  {
-    number: "03",
-    title: "Industrial Descaling",
-    description:
-      "Address scale and stubborn residue with cleaning methods selected for your equipment.",
-    icon: "clean",
-  },
-] as const;
+import ContactUsLink from "./contact-us-link";
+import ContactDetails from "./contact-details";
+import PriceEstimatorTrigger from "./price-estimator-trigger";
+import ProjectCarousel from "./projects/project-carousel";
+import Image from "next/image";
+import { getCompanyProfiles, getProjects } from "@/lib/api";
+import { normalizeWhatsAppNumber } from "@/lib/contact-links";
+import { connection } from "next/server";
 
 const advantages = [
   {
     number: "01",
-    title: "Application context",
+    title: "Siap Memenuhi Kebutuhan Anda",
     description:
-      "Equipment, operating conditions, and the type of buildup help shape a suitable cleaning approach.",
+      "Pekerjaan dilakukan sesuai spesifikasi dan kriteria penerimaan yang telah disepakati.",
   },
   {
     number: "02",
-    title: "Focused scope",
+    title: "Proses Cleaning dan Inspeksi Terukur",
     description:
-      "Tube and pipe cleaning needs can be considered in the context of your wider industrial system.",
+      "Lingkup kerja dan kriteria penerimaan disepakati sebelum pekerjaan dimulai.",
   },
   {
     number: "03",
-    title: "Clear discussions",
+    title: "Tepat Waktu dan Bergaransi",
     description:
-      "A clear description of the equipment and cleaning need helps establish practical next steps.",
+      "Setiap proyek dilaksanakan berdasarkan lingkup kerja, kriteria penerimaan, dan ketentuan layanan yang disepakati.",
+  },
+] as const;
+
+const featuredServices = [
+  {
+    number: "01",
+    name: "Dry Pigging",
+    description:
+      "Pembersihan inner tube / pipe menggunakan metode Dry Pigging untuk membantu mengangkat endapan dan residu.",
+    icon: "pipe",
+  },
+  {
+    number: "02",
+    name: "Eddy Current Testing (ECT)",
+    description:
+      "Inspeksi tube tanpa merusak untuk membantu menilai kondisi tube dan mengidentifikasi indikasi yang memerlukan evaluasi lebih lanjut.",
+    icon: "clean",
   },
 ] as const;
 
@@ -75,7 +76,11 @@ function ArrowIcon({ diagonal = false }: { diagonal?: boolean }) {
   );
 }
 
-function ServiceIcon({ name }: { name: (typeof services)[number]["icon"] }) {
+function ServiceIcon({
+  name,
+}: {
+  name: "tube" | "pipe" | "clean";
+}) {
   if (name === "tube") {
     return (
       <svg viewBox="0 0 32 32" fill="none" className="size-7">
@@ -133,38 +138,63 @@ function TubeIllustration() {
   return (
     <div
       aria-hidden="true"
-      className="relative mx-auto aspect-[1.12] w-full max-w-[570px] overflow-hidden rounded-2xl border border-white/10 bg-[#182a39] shadow-2xl shadow-black/20"
+      className="relative mx-auto aspect-[1.4] w-full max-w-[570px] overflow-hidden rounded-2xl border border-white/10 bg-[#182a39] shadow-2xl shadow-black/20"
     >
+      <Image
+        src="/bene-hero-ndt.png"
+        alt=""
+        fill
+        priority
+        sizes="(max-width: 768px) 100vw, 570px"
+        className="object-cover object-[center_48%]"
+      />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_18%,rgba(244,119,33,0.2),transparent_38%),linear-gradient(145deg,transparent_30%,rgba(5,14,23,0.55))]" />
       <div className="absolute left-[12%] top-[13%] h-px w-[76%] bg-white/10" />
       <div className="absolute left-[12%] top-[87%] h-px w-[76%] bg-white/10" />
       <div className="absolute left-[12%] top-[13%] h-[74%] w-px bg-white/10" />
       <div className="absolute right-[12%] top-[13%] h-[74%] w-px bg-white/10" />
 
-      <div className="absolute left-1/2 top-1/2 flex h-[49%] w-[79%] -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-[2.2%] rounded-[50%] border-[10px] border-[#8b9aa4] bg-[#253a49] shadow-[inset_0_0_0_5px_rgba(5,14,23,0.55),0_20px_45px_rgba(0,0,0,0.3)] sm:border-[14px]">
-        {Array.from({ length: 9 }, (_, index) => (
-          <span
-            key={index}
-            className="h-[65%] min-w-0 flex-1 rounded-full border border-white/45 bg-[linear-gradient(90deg,#526875,#d5d8d2_38%,#75858c_70%,#354c5b)] shadow-[inset_2px_0_3px_rgba(255,255,255,0.4),inset_-2px_0_3px_rgba(4,13,20,0.4)]"
-          />
-        ))}
-      </div>
-
-      <div className="absolute bottom-[9%] left-[8%] flex items-center gap-3 rounded-lg border border-white/10 bg-[#101d29]/90 px-4 py-3 backdrop-blur">
+      <div className="absolute bottom-[7%] left-[6%] flex items-center gap-3 rounded-lg border border-white/10 bg-[#101d29]/95 px-4 py-3 backdrop-blur">
         <span className="size-2 rounded-full bg-[#f47721]" />
         <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75 sm:text-xs">
-          Precision tube &amp; pipe care
+          DRY PIGGING &amp; INSPEKSI TUBE
         </span>
       </div>
       <span className="absolute right-[8%] top-[8%] font-mono text-[10px] tracking-[0.2em] text-white/40 sm:text-xs">
-        TP / INDUSTRIAL
+        PETROKIMIA, OIL &amp; GAS
       </span>
     </div>
   );
 }
 
-export default function Home() {
+
+export default async function Home() {
+  await connection();
+
+  const [profilesResult, projectsResult] = await Promise.allSettled([
+    getCompanyProfiles(),
+    getProjects(),
+  ]);
+
+  const profiles =
+    profilesResult.status === "fulfilled" ? profilesResult.value : [];
+  const profileLoadFailed = profilesResult.status === "rejected";
+  const projects =
+    projectsResult.status === "fulfilled" ? projectsResult.value : [];
+  const projectLoadFailed = projectsResult.status === "rejected";
+
+  if (profileLoadFailed) {
+    console.error("Gagal memuat profil perusahaan:", profilesResult.reason);
+  }
+  if (projectLoadFailed) {
+    console.error("Gagal memuat daftar proyek:", projectsResult.reason);
+  }
+
+  const company = profiles[0];
+  const companyName = company?.display_name?.trim() || "BENE";
+
   return (
+
     <>
       <SiteHeader />
 
@@ -174,51 +204,38 @@ export default function Home() {
           aria-labelledby="home-heading"
           className="overflow-hidden bg-[#101d29] text-white"
         >
-          <div className="mx-auto grid max-w-7xl items-center gap-10 px-5 py-14 sm:px-8 sm:py-16 md:grid-cols-[1fr_0.95fr] md:gap-10 md:py-20 lg:gap-16 lg:px-12 lg:py-24">
+          <div className="mx-auto grid max-w-7xl items-center gap-9 px-5 py-12 sm:px-8 sm:py-14 md:grid-cols-[1.05fr_0.95fr] md:gap-8 md:py-16 lg:gap-12 lg:px-12 lg:py-20">
             <div className="max-w-2xl">
-              <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#f47721] sm:text-sm">
+              <p className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#f47721] sm:text-sm">
                 <span className="h-px w-8 bg-[#f47721]" />
-                Industrial tube &amp; pipe cleaning
+                {company?.legal_name || companyName}
               </p>
-              <h1 id="home-heading" className="text-4xl font-semibold leading-[1.08] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
-                Precision Tube &amp; Pipe Cleaning Solutions
+              <h1 id="home-heading" className="max-w-[16ch] text-4xl font-semibold leading-[1.08] tracking-[-0.04em] sm:text-5xl lg:text-[3.5rem]">
+                Penyedia Jasa Terbaik Tube / Pipe Cleaning untuk Anda
               </h1>
-              <p className="mt-6 max-w-xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-                Practical cleaning solutions for industrial tubes and pipes.
-                We help remove buildup and residue with an approach tailored to
-                your equipment and application.
+              <p className="mt-5 max-w-lg text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+                Kami melayani kebutuhan industri petrokimia, oil & gas,
+                serta manufaktur di Indonesia melalui tube / pipe cleaning
+                dengan metode Dry Pigging serta inspeksi tube menggunakan Eddy
+                Current Testing (ECT).
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
                 <a
                   href="#services"
                   className="inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-[#b74e0d] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#9f4006]"
                 >
-                  Explore Our Services <ArrowIcon />
+                  Lihat Layanan <ArrowIcon />
                 </a>
-                <a
-                  href="#contact"
+                <ContactUsLink
+                  whatsappNumber={company?.whatsapp_number ?? null}
                   className="inline-flex min-h-12 items-center justify-center gap-3 rounded-md border border-white/25 px-6 text-sm font-semibold text-white transition-colors hover:border-white/60 hover:bg-white/5"
                 >
-                  Contact Us <ArrowIcon diagonal />
-                </a>
-              </div>
-              <div className="mt-10 flex items-center gap-4 border-t border-white/10 pt-6 text-sm text-slate-300">
-                <span className="flex size-9 items-center justify-center rounded-full border border-[#f47721]/50 text-[#f47721]">
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    className="size-4"
-                  >
-                    <path
-                      d="M10 2.5v15M2.5 10h15"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
-                Focused on tube and pipe cleaning for industry
+                  Hubungi Kami <ArrowIcon diagonal />
+                </ContactUsLink>
+                <PriceEstimatorTrigger
+                  whatsappNumber={company?.whatsapp_number ?? null}
+                  className="inline-flex min-h-12 items-center justify-center gap-3 rounded-md border border-[#f47721] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#f47721]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f47721] focus-visible:ring-offset-2 focus-visible:ring-offset-[#101d29] motion-reduce:transition-none"
+                />
               </div>
             </div>
             <TubeIllustration />
@@ -230,42 +247,62 @@ export default function Home() {
           <div className="mx-auto grid max-w-7xl gap-5 px-5 py-12 sm:px-8 sm:py-16 md:grid-cols-[0.8fr_1.2fr] md:items-start lg:px-12">
             <p className="flex items-center gap-3 pt-2 text-xs font-semibold uppercase tracking-[0.2em] text-[#a7470a] sm:text-sm">
               <span className="h-px w-8 bg-[#a7470a]" />
-              About Tube Profile
+              TENTANG {companyName}
             </p>
             <div className="max-w-3xl">
               <h2 id="about-heading" className="text-3xl font-semibold leading-tight tracking-[-0.035em] text-[#142331] sm:text-4xl">
-                Cleaning solutions built around your operation.
+                Spesialis Pembersihan dan Inspeksi Tube
               </h2>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-slate-600">
-                Tube and pipe cleaning needs vary with the equipment, material,
-                access, and type of buildup. Tube Profile focuses on this area
-                of industrial cleaning, where understanding the application
-                helps frame a suitable method for discussion.
-              </p>
+              {profileLoadFailed ? (
+                <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600" role="status">
+                  Informasi profil perusahaan belum dapat dimuat. Silakan muat
+                  ulang halaman untuk mencoba kembali.
+                </p>
+              ) : company ? (
+                <>
+                  {company.background && (
+                    <p className="mt-5 max-w-2xl whitespace-pre-line text-base leading-7 text-slate-600">
+                      {company.background}
+                    </p>
+                  )}
+                  {company.vision && (
+                    <p className="mt-4 max-w-2xl whitespace-pre-line text-base leading-7 text-slate-600">
+                      <span className="font-semibold text-[#142331]">Visi:</span>{" "}
+                      {company.vision}
+                    </p>
+                  )}
+                  {company.mission && (
+                    <p className="mt-3 max-w-2xl whitespace-pre-line text-base leading-7 text-slate-600">
+                      <span className="font-semibold text-[#142331]">Misi:</span>{" "}
+                      {company.mission}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="mt-5 max-w-2xl text-sm leading-6 text-slate-600" role="status">
+                  Informasi profil perusahaan belum tersedia.
+                </p>
+              )}
             </div>
           </div>
         </section>
 
         <section id="services" aria-labelledby="services-heading" className="bg-white">
           <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
-            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div>
               <div>
                 <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#a7470a] sm:text-sm">
                   <span className="h-px w-8 bg-[#a7470a]" />
-                  What we do
+                  LAYANAN {companyName}
                 </p>
                 <h2 id="services-heading" className="text-3xl font-semibold tracking-[-0.035em] text-[#142331] sm:text-4xl">
-                  Cleaning services
+                  Layanan Tube / Pipe Cleaning
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-6 text-slate-600 sm:text-base">
-                Targeted cleaning for the internal surfaces that keep
-                industrial systems moving.
-              </p>
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {services.map((service) => (
+            <div className="mt-10 grid gap-4 md:grid-cols-2">
+              {featuredServices.map((service) => (
                 <article
                   key={service.number}
                   className="group flex min-h-64 flex-col border border-slate-200 bg-white p-6 transition-all hover:-translate-y-1 hover:border-[#f47721]/50 hover:shadow-xl hover:shadow-slate-900/5 sm:p-8"
@@ -279,7 +316,7 @@ export default function Home() {
                     </span>
                   </div>
                   <h3 className="mt-7 text-xl font-semibold text-[#142331]">
-                    {service.title}
+                    {service.name}
                   </h3>
                   <p className="mt-3 text-sm leading-6 text-slate-600">
                     {service.description}
@@ -288,7 +325,7 @@ export default function Home() {
                     href="#contact"
                     className="mt-auto inline-flex w-fit items-center gap-2 pt-6 text-sm font-semibold text-[#142331] transition-colors group-hover:text-[#a7470a]"
                   >
-                    Discuss your needs <ArrowIcon />
+                    Konsultasikan Kebutuhan Anda <ArrowIcon />
                   </a>
                 </article>
               ))}
@@ -296,30 +333,28 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="products" aria-labelledby="products-heading" className="bg-[#edf0f1]">
-          <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 sm:px-8 sm:py-16 md:grid-cols-2 md:items-center lg:px-12">
-            <div>
+        <section id="projects" aria-labelledby="projects-heading" className="bg-[#edf0f1]">
+          <div className="mx-auto max-w-7xl px-5 pb-8 pt-12 sm:px-8 sm:pb-10 sm:pt-16 lg:px-12">
+            <div className="max-w-2xl">
               <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#a7470a] sm:text-sm">
                 <span className="h-px w-8 bg-[#a7470a]" />
-                Products &amp; methods
+                Proyek {companyName}
               </p>
-              <h2 id="products-heading" className="max-w-xl text-3xl font-semibold leading-tight tracking-[-0.035em] text-[#142331] sm:text-4xl">
-                The right cleaning method starts with the details.
+              <h2 id="projects-heading" className="text-3xl font-semibold leading-tight tracking-[-0.035em] text-[#142331] sm:text-4xl">
+                Proyek yang Pernah Kami Lakukan
               </h2>
-            </div>
-            <div className="border-l-2 border-[#f47721] pl-6 sm:pl-8">
-              <p className="text-base leading-7 text-slate-600">
-                Tube and pipe dimensions, material, access, and the type of
-                buildup all matter. Tell us about your application and we can
-                discuss suitable cleaning equipment and methods for the job.
+              <p className="mt-4 text-sm leading-6 text-slate-600 sm:text-base">
+                Temukan proyek pembersihan dan inspeksi tube yang telah kami
+                kerjakan untuk berbagai kebutuhan industri.
               </p>
-              <a
-                href="#contact"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[#142331] transition-colors hover:text-[#a7470a]"
-              >
-                Talk through your application <ArrowIcon />
-              </a>
             </div>
+            {projectLoadFailed ? (
+              <p className="mx-auto mt-8 flex min-h-24 max-w-3xl items-center justify-center border border-slate-200 bg-white px-5 py-6 text-center text-sm leading-6 text-slate-600 sm:px-8">
+                Terjadi kendala saat memuat data. Silakan coba kembali.
+              </p>
+            ) : (
+              <ProjectCarousel projects={projects} />
+            )}
           </div>
         </section>
 
@@ -328,10 +363,10 @@ export default function Home() {
             <div className="max-w-2xl">
               <p className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#a7470a] sm:text-sm">
                 <span className="h-px w-8 bg-[#a7470a]" />
-                Why Tube Profile
+                MENGAPA {companyName}?
               </p>
               <h2 id="why-heading" className="text-3xl font-semibold tracking-[-0.035em] text-[#142331] sm:text-4xl">
-                A focused partner for cleaner systems.
+                Kami Bukan Sekadar Penyedia Jasa Pembersihan Tube / Pipe
               </h2>
             </div>
             <div className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
@@ -356,63 +391,95 @@ export default function Home() {
         </section>
 
         <section id="contact" aria-labelledby="contact-heading" className="bg-[#101d29] text-white">
-          <div className="mx-auto flex max-w-7xl flex-col gap-7 px-5 py-12 sm:px-8 sm:py-14 md:flex-row md:items-center md:justify-between lg:px-12">
-            <div className="max-w-2xl">
+          <div className="mx-auto flex max-w-7xl flex-col gap-7 px-5 py-12 sm:px-8 sm:py-14 md:flex-row md:items-center md:gap-12 lg:px-12">
+            <div className="min-w-0 flex-1">
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#f47721] sm:text-sm">
-                Start a conversation
+                MARI BICARA LEBIH LANJUT
               </p>
-              <h2 id="contact-heading" className="text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">
-                Need to clean a tube or pipe system?
+              <h2 id="contact-heading" className="max-w-[28ch] text-3xl font-semibold leading-[1.12] tracking-[-0.035em] sm:text-4xl md:max-w-none">
+                Butuh Jasa Tube / Pipe Cleaning dan Inspeksi?
               </h2>
-              <p className="mt-4 text-sm leading-6 text-slate-300 sm:text-base">
-                Share a little about your equipment and cleaning requirements.
-                We&apos;ll be glad to discuss the next step.
-              </p>
-              <p className="mt-3 text-sm leading-6 text-slate-400">
-                Informasi kontak resmi akan ditampilkan setelah dikonfirmasi.
+              <p className="mt-4 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
+                Hubungi kami untuk membahas kebutuhan
+                proyek Anda.
               </p>
             </div>
-            <a
-              href="#contact"
-              className="inline-flex min-h-12 shrink-0 items-center justify-center gap-3 rounded-md bg-[#b74e0d] px-6 text-sm font-semibold text-white transition-colors hover:bg-[#9f4006]"
-            >
-              Contact Us <ArrowIcon diagonal />
-            </a>
+            <div className="flex w-full flex-col items-stretch gap-3 md:w-auto md:shrink-0 md:items-end">
+              <ContactUsLink
+                whatsappNumber={company?.whatsapp_number ?? null}
+                fallbackHref="#contact"
+                className="inline-flex min-h-16 w-full shrink-0 items-center justify-center gap-3 rounded-md bg-[#b74e0d] px-9 py-[1.125rem] text-base font-semibold text-white transition-colors hover:bg-[#9f4006] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f47721] focus-visible:ring-offset-2 focus-visible:ring-offset-[#101d29] md:w-auto"
+              >
+                Hubungi Kami <ArrowIcon diagonal />
+              </ContactUsLink>
+              {!normalizeWhatsAppNumber(company?.whatsapp_number) && (
+              <p className="text-sm text-slate-400">
+                Tautan WhatsApp belum tersedia. Nomor WhatsApp internasional
+                perlu dikonfirmasi pada profil perusahaan.
+              </p>
+              )}
+            </div>
           </div>
         </section>
       </main>
 
       <footer className="bg-[#0b151e] text-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-8 sm:px-8 md:flex-row md:items-center md:justify-between lg:px-12">
-          <a href="#home" className="flex w-fit items-center gap-3">
-            <BrandMark />
-            <span className="font-semibold tracking-tight">
-              Tube <span className="text-[#f47721]">Profile</span>
-            </span>
-          </a>
-          <nav
-            aria-label="Footer navigation"
-            className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400"
-          >
-            <a className="inline-flex min-h-11 items-center transition-colors hover:text-white" href="#home">
-              Home
-            </a>
-            <a className="inline-flex min-h-11 items-center transition-colors hover:text-white" href="#about">
-              About Us
-            </a>
-            <a className="inline-flex min-h-11 items-center transition-colors hover:text-white" href="#services">
-              Services
-            </a>
-            <a className="inline-flex min-h-11 items-center transition-colors hover:text-white" href="#products">
-              Products
-            </a>
-            <a className="inline-flex min-h-11 items-center transition-colors hover:text-white" href="#contact">
-              Contact
-            </a>
-          </nav>
-          <p className="text-xs text-slate-400">
-            &copy; {new Date().getFullYear()} Tube Profile
-          </p>
+        <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-12 lg:px-12">
+          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-[1.2fr_0.8fr_1fr] md:gap-10">
+            <div>
+              <a href="#home" className="flex w-fit items-center gap-3">
+                <BrandMark />
+                <span className="font-semibold tracking-tight">
+                  B<span className="text-[#f47721]">ENE</span>
+                </span>
+              </a>
+              <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
+                {company?.background?.trim() ||
+                  "Informasi perusahaan belum tersedia."}
+              </p>
+            </div>
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-white">
+                Navigasi
+              </h2>
+              <nav
+                aria-label="Navigasi footer"
+                className="mt-3 flex flex-col items-start text-sm text-slate-400"
+              >
+                <a className="inline-flex min-h-9 items-center transition-colors hover:text-white" href="#home">
+                  Beranda
+                </a>
+                <a className="inline-flex min-h-9 items-center transition-colors hover:text-white" href="#about">
+                  Tentang Kami
+                </a>
+                <a className="inline-flex min-h-9 items-center transition-colors hover:text-white" href="#services">
+                  Layanan
+                </a>
+                <a className="inline-flex min-h-9 items-center transition-colors hover:text-white" href="#projects">
+                  Proyek
+                </a>
+                <a className="inline-flex min-h-9 items-center transition-colors hover:text-white" href="#contact">
+                  Kontak
+                </a>
+              </nav>
+            </div>
+            <div>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-white">
+                Informasi Kontak
+              </h2>
+              <ContactDetails
+                address={company?.address ?? null}
+                email={company?.email ?? null}
+                whatsappNumber={company?.whatsapp_number ?? null}
+              />
+            </div>
+          </div>
+          <div className="mt-8 border-t border-white/10 pt-5">
+            <p className="text-center text-xs text-slate-400">
+              &copy; {new Date().getFullYear()}{" "}
+              {company?.legal_name?.trim() || companyName}. Hak Cipta Dilindungi.
+            </p>
+          </div>
         </div>
       </footer>
     </>

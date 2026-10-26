@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Tube Profile | Tube & Pipe Cleaning Solutions",
+  title: "BENE | Solusi Pembersihan Tube & Pipe",
   description:
-    "Industrial tube and pipe cleaning solutions tailored to your equipment and application.",
+    "Layanan pembersihan tube dan pipe untuk kebutuhan peralatan dan aplikasi industri.",
+  referrer: "no-referrer",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="id" className="h-full antialiased">
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

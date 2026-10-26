@@ -1,14 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState } from "react";
 import BrandMark from "./brand-mark";
 
 const navigationLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About Us", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Products", href: "#products" },
-  { label: "Contact", href: "#contact" },
+  { label: "Beranda", href: "/#home" },
+  { label: "Tentang Kami", href: "/#about" },
+  { label: "Layanan", href: "/#services" },
+  { label: "Proyek", href: "/#projects" },
+  { label: "Kontak", href: "/#contact" },
+  { label: "Masuk Admin", href: "/admin/login" },
 ] as const;
 
 export default function SiteHeader() {
@@ -19,16 +21,16 @@ export default function SiteHeader() {
     <header className="relative z-10 border-b border-white/10 bg-[#101d29] text-white">
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-3 sm:px-8 md:flex-row md:items-center md:justify-between md:gap-6 md:py-4 lg:px-12">
         <div className="flex items-center justify-between">
-          <a href="#home" className="flex w-fit items-center gap-3">
+          <Link href="/#home" className="flex w-fit items-center gap-3">
             <BrandMark />
             <span className="text-lg font-bold tracking-tight">
-              Tube <span className="text-[#f47721]">Profile</span>
+              B<span className="text-[#f47721]">ENE</span>
             </span>
-          </a>
+          </Link>
           <button
             ref={menuButtonRef}
             type="button"
-            aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={menuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
             aria-expanded={menuOpen}
             aria-controls="primary-navigation"
             onClick={() => setMenuOpen((open) => !open)}
@@ -67,7 +69,7 @@ export default function SiteHeader() {
         </div>
         <nav
           id="primary-navigation"
-          aria-label="Main navigation"
+          aria-label="Navigasi utama"
           onKeyDown={(event) => {
             if (event.key === "Escape" && menuOpen) {
               setMenuOpen(false);
@@ -77,14 +79,18 @@ export default function SiteHeader() {
           className={`${menuOpen ? "flex" : "hidden"} flex-col gap-1 border-t border-white/10 pt-2 text-sm text-white/70 md:flex md:flex-row md:items-center md:gap-x-6 md:border-0 md:pt-0`}
         >
           {navigationLinks.map(({ label, href }) => (
-            <a
+            <Link
               key={href}
-              className="inline-flex min-h-11 items-center rounded px-2 transition-colors hover:bg-white/5 hover:text-white md:px-0 md:hover:bg-transparent"
+              className={`inline-flex min-h-11 items-center rounded px-2 transition-colors hover:bg-white/5 hover:text-white md:px-0 md:hover:bg-transparent ${
+                href === "/admin/login"
+                  ? "font-semibold text-[#f47721] hover:text-white"
+                  : ""
+              }`}
               href={href}
               onClick={() => setMenuOpen(false)}
             >
               {label}
-            </a>
+            </Link>
           ))}
         </nav>
       </div>
