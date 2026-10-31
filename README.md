@@ -4,7 +4,7 @@
 
 Tube Profile is a web-based platform designed to introduce industrial tube and pipe cleaning services, showcase company information and project portfolios, and help potential customers request cleaning estimates.
 
-The platform consists of a public-facing website and an administrative interface for managing company information and project portfolios.
+The platform consists of a public-facing website and an administrative dashboard for managing company information and project portfolios.
 
 ## Features
 
@@ -19,17 +19,17 @@ The platform consists of a public-facing website and an administrative interface
 - Admin authentication and access control.
 - Company profile management.
 - Project portfolio management.
-- Project image upload and validation.
-- Login, forgot-password, and password-reset workflows with OTP support, where configured.
+- Project image upload, preview, and validation.
+- Forgot-password and password-reset workflows with OTP support, where configured.
 
 ### Estimate Request
-The estimate form is designed to collect relevant tube and pipe cleaning requirements, including:
+The estimate form collects:
 - Inner diameter (mm).
 - Tube or pipe length (mm).
 - Quantity.
 - Contaminant type: soft, medium, or hard.
 
-The estimate is intended to exclude mobilization and demobilization costs. Final pricing and operational terms should be confirmed with the service provider.
+The estimated price excludes mobilization and demobilization costs. Final pricing and operational terms should be confirmed with the service provider.
 
 ## Technology Stack
 
@@ -40,28 +40,33 @@ The estimate is intended to exclude mobilization and demobilization costs. Final
 | Backend | Laravel, PHP |
 | Database | PostgreSQL |
 | API | REST API |
-| Authentication | Laravel Sanctum, with admin authorization |
+| Authentication | Laravel Sanctum |
+| Image Storage | ImageKit |
 | Frontend Testing | Vitest |
-| Backend Testing | Laravel PHPUnit test suite |
+| Backend Testing | PHPUnit |
 | Version Control | Git and GitHub |
 
 ## Project Structure
 
 ```text
 tube-profile/
-├── tube-profile-frontend/
+├── app/                    # Laravel application
+├── bootstrap/
+├── config/
+├── database/
+├── public/
+├── resources/
+├── routes/
+├── storage/
+├── tests/
+├── frontend/               # Next.js application
 │   ├── public/
 │   ├── src/
 │   ├── package.json
 │   └── ...
-├── tube-profile-backend/
-│   ├── app/
-│   ├── config/
-│   ├── database/
-│   ├── routes/
-│   ├── tests/
-│   ├── composer.json
-│   └── ...
+├── artisan
+├── composer.json
+├── composer.lock
 └── README.md
 ```
 
@@ -69,14 +74,11 @@ tube-profile/
 
 ### Prerequisites
 
-Install the following tools before running the application:
-
 - Git
 - Node.js and npm
-- PHP compatible with the backend dependencies
+- PHP compatible with Laravel dependencies
 - Composer
 - PostgreSQL
-- A web browser
 
 ### 1. Clone the Repository
 
@@ -85,79 +87,115 @@ git clone https://github.com/chintyabrillianti/tube-profile.git
 cd tube-profile
 ```
 
-### 2. Set Up the Backend
+### 2. Backend Setup
 
-Open a terminal in the backend directory:
+Install dependencies:
 
 ```bash
-cd tube-profile-backend
 composer install
 ```
 
-Create a local environment configuration from the example file if one is provided:
-
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell, you can use:
+Create the environment file:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-Configure the local environment with your PostgreSQL connection details and the required application settings. Do not commit your `.env` file or expose credentials.
+Configure PostgreSQL and the required application environment variables in `.env`.
 
-Generate the Laravel application key:
+Generate the application key:
 
 ```bash
 php artisan key:generate
 ```
 
-Create the PostgreSQL database according to your local configuration.
-
-**Database setup:** Review the existing migrations and confirm the target database before running any migration. Never run migrations against a production database unintentionally.
-
-Once the local database is ready, run the migrations if appropriate:
+Run database migrations after confirming the target database:
 
 ```bash
 php artisan migrate
 ```
 
-Start the backend development server:
+Configure ImageKit credentials:
+
+```dotenv
+IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_URL_ENDPOINT=
+```
+
+Do not commit the actual `.env` file or expose credentials.
+
+Create an administrator after the required role tables exist:
+
+```bash
+php artisan tube-profile:create-admin
+```
+
+Start the backend:
 
 ```bash
 php artisan serve
 ```
 
-Laravel typically serves the application at `http://127.0.0.1:8000`.
+The default local backend address is `http://127.0.0.1:8000`.
 
-### 3. Set Up the Frontend
+### 3. Frontend Setup
 
 Open another terminal:
 
-```bash
-cd tube-profile-frontend
+```powershell
+cd frontend
 npm install
 ```
 
-Create the frontend environment configuration using the variable names expected by the project's API client. Configure the API base URL to point to your local Laravel backend.
+Configure the frontend API environment variable according to the API client and authentication setup.
 
-Start the Next.js development server:
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open `http://localhost:3000`.
 
-> **Note:** The frontend and backend must be configured to communicate correctly. Authentication cookies, CSRF protection, CORS, and Sanctum stateful domains may also require local configuration.
+The frontend and backend must be configured to communicate correctly. Authentication requires appropriate Sanctum stateful domains, CORS, CSRF, and session-cookie settings.
+
+## Admin Authentication
+
+The admin login uses Laravel Sanctum's session-cookie authentication.
+
+Configure `SANCTUM_STATEFUL_DOMAINS` and `CORS_ALLOWED_ORIGINS` for the intended frontend host. In production, use HTTPS and secure session cookies.
+
+The admin login page is:
+
+```text
+/admin/login
+```
+
+Protected API endpoints require authenticated administrator access. Public company profile, service, and project endpoints remain accessible without admin authentication.
+
+## Project Portfolio Management
+
+Administrators can manage project portfolio records through protected API endpoints:
+
+- `GET /api/admin/projects`
+- `POST /api/admin/projects`
+- `PUT /api/admin/projects/{project}`
+- `DELETE /api/admin/projects/{project}`
+
+Public projects are available through:
+
+```text
+GET /api/projects
+```
+
+Project images are stored using ImageKit. The database stores the image URL and ImageKit file identifier to support image updates and deletion.
 
 ## Testing
 
 ### Backend
 
-From `tube-profile-backend`:
+From the project root:
 
 ```bash
 php artisan test
@@ -165,7 +203,7 @@ php artisan test
 
 ### Frontend
 
-From `tube-profile-frontend`:
+From the `frontend` directory:
 
 ```bash
 npm test
@@ -173,23 +211,23 @@ npm run lint
 npm run build
 ```
 
-The commands above are intended for local validation. Test results can vary depending on the environment and available services.
+Test results may vary depending on the environment and available services.
 
 ## Security Notes
 
-- Never commit `.env` files, API keys, passwords, access tokens, or production credentials.
+- Never commit `.env` files, API keys, passwords, or production credentials.
 - Use environment variables for sensitive configuration.
 - Restrict administrative functionality to authorized administrators.
 - Validate uploaded files and user input on the server.
-- Configure CORS, CSRF protection, and authentication settings for the intended deployment environment.
-- Use HTTPS and secure cookie settings in production.
+- Configure CORS, CSRF, Sanctum, and secure cookies correctly.
+- Use HTTPS in production.
 - Use a dedicated test database for automated tests.
 
 ## Project Status
 
-The project includes a Next.js frontend, Laravel backend, administrative features, and automated tests.
+The project includes a Next.js frontend, Laravel backend, PostgreSQL database integration, administrative features, project portfolio management, and external image storage through ImageKit.
 
-Production deployment, external PostgreSQL connectivity, and real SMTP/OTP delivery should be verified in the target environment before the application is considered production-ready.
+Production deployment, database connectivity, authentication, and email/OTP delivery should be verified in the target hosting environment before the application is considered production-ready.
 
 ## Author
 
