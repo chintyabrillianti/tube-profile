@@ -50,7 +50,7 @@ export interface PublicProject extends Project {
   image_url: string;
 }
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
   success: boolean;
   data: T;
 }

@@ -5,7 +5,10 @@ import ContactDetails from "./contact-details";
 import PriceEstimatorTrigger from "./price-estimator-trigger";
 import ProjectCarousel from "./projects/project-carousel";
 import Image from "next/image";
-import { getCompanyProfiles, getProjects } from "@/lib/api";
+import {
+  getCompanyProfiles,
+  getProjects,
+} from "@/lib/server-api";
 import { normalizeWhatsAppNumber } from "@/lib/contact-links";
 import { connection } from "next/server";
 

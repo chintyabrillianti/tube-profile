@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import SiteHeader from "../site-header";
-import { getProjects } from "@/lib/api";
+import { getProjects } from "@/lib/server-api";
 import type { PublicProject } from "@/lib/api";
 import ProjectDirectory from "./project-directory";
 
