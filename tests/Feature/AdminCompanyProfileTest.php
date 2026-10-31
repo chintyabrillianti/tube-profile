@@ -5,9 +5,7 @@ namespace Tests\Feature;
 use App\Models\CompanyProfile;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class AdminCompanyProfileTest extends TestCase
@@ -15,28 +13,9 @@ class AdminCompanyProfileTest extends TestCase
     use RefreshDatabase;
 
     protected function setUp(): void
-    {
-        parent::setUp();
-
-        Schema::create('company_profiles', function (Blueprint $table): void {
-            $table->id();
-            $table->string('legal_name', 200);
-            $table->string('display_name', 200);
-            $table->string('slug', 220)->unique();
-            $table->text('background');
-            $table->text('vision');
-            $table->text('mission');
-            $table->text('address');
-            $table->string('phone', 30)->nullable();
-            $table->string('email')->nullable();
-            $table->string('whatsapp_number', 30)->nullable();
-            $table->text('website_url')->nullable();
-            $table->json('business_hours');
-            $table->boolean('is_published')->default(true);
-            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestampsTz();
-        });
-    }
+{
+    parent::setUp();
+}
 
     public function test_guest_cannot_read_or_update_the_admin_profile(): void
     {

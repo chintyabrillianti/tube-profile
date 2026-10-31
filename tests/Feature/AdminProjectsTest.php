@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Support\Facades\Http;
 use App\Models\Project;
 use App\Models\Role;
 use App\Models\User;
@@ -42,17 +43,18 @@ class AdminProjectsTest extends TestCase
         $this->getJson('/api/admin/projects')->assertUnauthorized();
         $this->postJson('/api/admin/projects', $this->projectData())
             ->assertUnauthorized();
-        $this->putJson('/api/admin/projects/'.$project->id, $this->projectData())
+        $this->putJson('/api/admin/projects/' . $project->id, $this->projectData())
             ->assertUnauthorized();
-        $this->deleteJson('/api/admin/projects/'.$project->id)->assertUnauthorized();
+        $this->deleteJson('/api/admin/projects/' . $project->id)->assertUnauthorized();
 
         $this->actingAs(User::factory()->create());
         $this->getJson('/api/admin/projects')->assertForbidden();
-        $this->deleteJson('/api/admin/projects/'.$project->id)->assertForbidden();
+        $this->deleteJson('/api/admin/projects/' . $project->id)->assertForbidden();
     }
 
     public function test_admin_can_upload_create_edit_and_delete_project(): void
     {
+        $this->fakeImageKitUploads(2);
         Storage::fake('public');
         $admin = $this->admin();
         $this->actingAs($admin);
@@ -66,10 +68,18 @@ class AdminProjectsTest extends TestCase
             ->assertJsonPath('data.is_published', true);
 
         $project = Project::query()->firstOrFail();
-        $oldImagePath = $project->image_path;
-        Storage::disk('public')->assertExists($oldImagePath);
 
-        $this->post('/api/admin/projects/'.$project->id, [
+        $oldImagePath = $project->image_path;
+        $oldFileId = $project->imagekit_file_id;
+
+        self::assertStringStartsWith(
+            'https://ik.imagekit.io/',
+            $oldImagePath
+        );
+
+        self::assertNotEmpty($oldFileId);
+
+        $this->post('/api/admin/projects/' . $project->id, [
             '_method' => 'PUT',
             ...$this->projectData([
                 'title' => 'Updated project title',
@@ -84,19 +94,27 @@ class AdminProjectsTest extends TestCase
             ->assertJsonPath('data.is_published', false);
 
         $project->refresh();
+
         self::assertNotSame($oldImagePath, $project->image_path);
-        Storage::disk('public')->assertMissing($oldImagePath);
+        self::assertNotSame($oldFileId, $project->imagekit_file_id);
+
         $replacementPath = $project->image_path;
-        Storage::disk('public')->assertExists($replacementPath);
+
+        self::assertStringStartsWith(
+            'https://ik.imagekit.io/',
+            $replacementPath
+        );
+
+        self::assertNotEmpty($project->imagekit_file_id);
 
         $this->getJson('/api/projects')
             ->assertOk()
             ->assertJsonCount(0, 'data');
 
-        $this->deleteJson('/api/admin/projects/'.$project->id)
+        $this->deleteJson('/api/admin/projects/' . $project->id)
             ->assertOk()
             ->assertJsonPath('success', true);
-        Storage::disk('public')->assertMissing($replacementPath);
+
         self::assertDatabaseMissing('projects', ['id' => $project->id]);
     }
 
@@ -153,7 +171,7 @@ class AdminProjectsTest extends TestCase
         $project = $this->createProject();
         $imagePath = $project->image_path;
 
-        $this->post('/api/admin/projects/'.$project->id, [
+        $this->post('/api/admin/projects/' . $project->id, [
             '_method' => 'PUT',
             ...$this->projectData(['title' => 'Updated without image']),
         ], ['Accept' => 'application/json'])
@@ -177,7 +195,7 @@ class AdminProjectsTest extends TestCase
             'image_path' => $project->image_path,
         ]);
 
-        $this->deleteJson('/api/admin/projects/'.$project->id)->assertOk();
+        $this->deleteJson('/api/admin/projects/' . $project->id)->assertOk();
 
         Storage::disk('public')->assertExists($project->image_path);
         self::assertDatabaseHas('projects', ['id' => $anotherProject->id]);
@@ -185,6 +203,7 @@ class AdminProjectsTest extends TestCase
 
     public function test_legacy_project_can_receive_portfolio_fields_and_an_image(): void
     {
+        $this->fakeImageKitUploads(1);
         $this->actingAs($this->admin());
         $project = $this->createProject([
             'summary' => null,
@@ -198,7 +217,7 @@ class AdminProjectsTest extends TestCase
             'description' => 'Long legacy project description retained.',
         ]);
 
-        $this->post('/api/admin/projects/'.$project->id, [
+        $this->post('/api/admin/projects/' . $project->id, [
             '_method' => 'PUT',
             ...$this->projectData(['title' => $project->title]),
             'image' => UploadedFile::fake()->image('legacy-project.jpg'),
@@ -215,14 +234,42 @@ class AdminProjectsTest extends TestCase
             'description' => 'Long legacy project description retained.',
             'summary' => 'Short description of the work.',
         ]);
-    }
 
+        $project->refresh();
+
+        self::assertStringStartsWith(
+            'https://ik.imagekit.io/',
+            $project->image_path
+        );
+
+        self::assertNotEmpty($project->imagekit_file_id);
+    }
+    private function fakeImageKitUploads(int $count): void
+    {
+        config([
+            'services.imagekit.private_key' => 'test-private-key',
+        ]);
+
+        $sequence = Http::sequence();
+
+        for ($i = 1; $i <= $count; $i++) {
+            $sequence->push([
+                'fileId' => 'test-imagekit-file-' . $i,
+                'url' => 'https://ik.imagekit.io/bene/tube-profile/projects/test-image-' . $i . '.jpg',
+            ], 200);
+        }
+
+        Http::fake([
+            'https://upload.imagekit.io/api/v1/files/upload' => $sequence,
+            'https://api.imagekit.io/v1/files/*' => Http::response([], 204),
+        ]);
+    }
     private function createProject(array $overrides = []): Project
     {
         Storage::disk('public')->put('projects/existing.jpg', 'image-data');
 
         return Project::query()->create([
-            'slug' => 'test-project-'.bin2hex(random_bytes(6)),
+            'slug' => 'test-project-' . bin2hex(random_bytes(6)),
             ...$this->projectData(),
             'summary' => 'Short description of the work.',
             'image_path' => 'projects/existing.jpg',
