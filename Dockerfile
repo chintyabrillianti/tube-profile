@@ -84,4 +84,5 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "php artisan migrate --force && exec apache2-foreground"]
+ENTRYPOINT ["sh", "-c", "php artisan migrate --force && exec apache2-foreground"]
+
