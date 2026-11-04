@@ -80,57 +80,12 @@ tube-profile/
 - Composer
 - PostgreSQL
 
-### 1. Clone the Repository
+### Clone the Repository
 
 ```bash
 git clone https://github.com/chintyabrillianti/tube-profile.git
 cd tube-profile
 ```
-
-### 2. Backend Setup
-
-Install dependencies:
-
-```bash
-composer install
-```
-
-Create the environment file:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-Configure PostgreSQL and the required application environment variables in `.env`.
-
-Generate the application key:
-
-```bash
-php artisan key:generate
-```
-
-Run database migrations after confirming the target database:
-
-```bash
-php artisan migrate
-```
-
-Configure ImageKit credentials:
-
-```dotenv
-IMAGEKIT_PUBLIC_KEY=
-IMAGEKIT_PRIVATE_KEY=
-IMAGEKIT_URL_ENDPOINT=
-```
-
-Do not commit the actual `.env` file or expose credentials.
-
-Create an administrator after the required role tables exist:
-
-```bash
-php artisan tube-profile:create-admin
-```
-
 Start the backend:
 
 ```bash
