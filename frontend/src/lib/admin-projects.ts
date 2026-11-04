@@ -134,6 +134,7 @@ export async function getAdminProjects(): Promise<Project[]> {
       credentials: "include",
       headers: { Accept: "application/json" },
       cache: "no-store",
+      referrerPolicy: "same-origin",
     });
   } catch {
     throw new Error("Tidak dapat terhubung ke server proyek.");
