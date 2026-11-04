@@ -233,6 +233,7 @@ export async function getCurrentAdmin(): Promise<AdminUser | null> {
     credentials: "include",
     headers: { Accept: "application/json" },
     cache: "no-store",
+    referrerPolicy: "same-origin",
   });
 
   if (response.status === 401 || response.status === 403) {
