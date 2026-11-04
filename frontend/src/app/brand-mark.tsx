@@ -1,14 +1,22 @@
 import Image from "next/image";
 
-export default function BrandMark() {
+type BrandMarkProps = {
+  className?: string;
+  preload?: boolean;
+};
+
+export default function BrandMark({
+  className = "h-12 w-auto sm:h-14",
+  preload = false,
+}: BrandMarkProps) {
   return (
     <Image
-      src="/bene-logo-horizontal.jpeg"
+      src="/logo-bene.png"
       alt="PT Brianov Egatara Nirbana Estu"
-      width={320}
-      height={144}
-      priority
-      className="h-14 w-auto object-contain sm:h-16"
+      width={745}
+      height={335}
+      preload={preload}
+      className={`object-contain ${className}`}
     />
   );
 }

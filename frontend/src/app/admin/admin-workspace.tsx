@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import BrandMark from "../brand-mark";
 import { getCurrentAdmin, logoutAdmin } from "@/lib/admin-auth";
 import type { AdminUser } from "@/lib/admin-auth";
 
@@ -83,16 +83,9 @@ function NavigationContents({
   return (
     <>
       <div className="border-b border-slate-200 px-5 py-6 lg:px-6">
-        <div className="flex items-center">
-  <Image
-    src="/bene-logo-horizontal.jpeg"
-    alt="PT Brianov Egatara Nirbana Estu"
-    width={180}
-    height={81}
-    priority
-    className="h-auto w-full max-w-[180px] object-contain"
-  />
-</div>
+        <div className="inline-flex items-center bg-[#101d29] px-2 py-1">
+          <BrandMark className="h-auto w-[180px] max-w-full" preload />
+        </div>
       </div>
 
       <nav aria-label="Navigasi admin" className="flex-1 space-y-1 px-3 py-5">

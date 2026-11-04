@@ -428,12 +428,9 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-12 lg:px-12">
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-[1.2fr_0.8fr_1fr] md:gap-10">
             <div>
-              <a
-  href="#home"
-  className="flex w-fit items-center rounded-md overflow-hidden"
->
-  <BrandMark />
-</a>
+              <a href="#home" className="flex w-fit items-center">
+                <BrandMark className="h-10 w-auto" />
+              </a>
               <p className="mt-4 max-w-sm text-sm leading-6 text-slate-400">
                 {company?.background?.trim() ||
                   "Informasi perusahaan belum tersedia."}

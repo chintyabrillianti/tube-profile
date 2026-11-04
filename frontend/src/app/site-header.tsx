@@ -22,8 +22,8 @@ export default function SiteHeader() {
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-3 sm:px-8 md:flex-row md:items-center md:justify-between md:gap-6 md:py-4 lg:px-12">
         <div className="flex items-center justify-between">
           <Link href="/#home" className="flex w-fit items-center">
-  <BrandMark />
-</Link>
+            <BrandMark className="h-12 w-auto sm:h-14" preload />
+          </Link>
           <button
             ref={menuButtonRef}
             type="button"

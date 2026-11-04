@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   description:
     "Layanan pembersihan tube dan pipe untuk kebutuhan peralatan dan aplikasi industri.",
   referrer: "no-referrer",
+  icons: {
+    icon: "/logo-bene.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
