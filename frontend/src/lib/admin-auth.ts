@@ -1,8 +1,5 @@
 import { API_URL } from "@/lib/api";
 
-const API_ORIGIN = new URL(API_URL).origin;
-const API_HOSTNAME = new URL(API_URL).hostname;
-
 export interface AdminUser {
   id: number;
   name: string;
@@ -22,13 +19,7 @@ function csrfToken(): string | null {
 }
 
 export async function prepareCsrf(): Promise<string> {
-  if (window.location.hostname !== API_HOSTNAME) {
-    throw new Error(
-      `Buka situs web menggunakan host ${API_HOSTNAME} agar cookie keamanan dapat digunakan.`,
-    );
-  }
-
-  const response = await fetch(`${API_ORIGIN}/sanctum/csrf-cookie`, {
+   const response = await fetch(`/sanctum/csrf-cookie`, {
     credentials: "include",
     headers: { Accept: "application/json" },
     cache: "no-store",

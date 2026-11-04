@@ -1,6 +1,11 @@
-export const API_URL =
+const BACKEND_API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://127.0.0.1:8000/api";
 
+// Di browser lewat proxy (/api) supaya cookie login satu domain.
+// Di server (render halaman) langsung ke backend.
+export const API_URL =
+  typeof window === "undefined" ? BACKEND_API_URL : "/api";
+  
 export interface CompanyProfile {
   id: number;
   legal_name: string;
